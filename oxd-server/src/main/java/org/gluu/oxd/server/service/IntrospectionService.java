@@ -42,14 +42,14 @@ public class IntrospectionService {
         final org.gluu.oxauth.client.service.IntrospectionService introspectionService = ProxyFactory.create(org.gluu.oxauth.client.service.IntrospectionService.class, introspectionEndpoint, httpService.getClientExecutor());
 
         try {
-            IntrospectionResponse response = introspectionService.introspectToken("Bearer " + tokenService.getPat(oxdId, ScopeType.OXD).getToken(), accessToken);
+            IntrospectionResponse response = introspectionService.introspectToken("Bearer " + tokenService.getOAuthToken(oxdId, ScopeType.OXD).getToken(), accessToken);
             return response; // we need local variable to force convertion here
         } catch (ClientResponseFailure e) {
             int status = e.getResponse().getStatus();
             LOG.debug("Failed to introspect token. Entity: " + e.getResponse().getEntity(String.class) + ", status: " + status, e);
             if (retry && (status == 400 || status == 401)) {
                 LOG.debug("Try maybe PAT is lost on AS, force refresh PAT and re-try ...");
-                tokenService.getPat(oxdId, ScopeType.OXD); // force to refresh PAT
+                tokenService.getOAuthToken(oxdId, ScopeType.OXD); // force to refresh PAT
                 return introspectToken(oxdId, accessToken, false);
             } else {
                 throw e;

@@ -120,7 +120,40 @@ public class TokenService {
         throw new HttpException(ErrorResponseCode.FAILED_TO_GET_RPT);
     }
 
-    public Pat getPat(String oxdId, ScopeType scopeType) {
+    public Token getOAuthToken(String oxdId, ScopeType scopeType) {
+        validationService.notBlankOxdId(oxdId);
+
+        Rp site = rpService.getRp(oxdId);
+
+        if (site.getOAuthToken() != null && site.getOAuthTokenCreatedAt() != null && site.getOAuthTokenExpiresIn() > 0) {
+            Calendar expiredAt = Calendar.getInstance();
+            expiredAt.setTime(site.getPatCreatedAt());
+            expiredAt.add(Calendar.SECOND, site.getPatExpiresIn());
+
+            if (!CoreUtils.isExpired(expiredAt.getTime())) {
+                LOG.debug("OAuthToken from site configuration, OAuthToken: " + site.getOAuthToken());
+                return new Token(site.getOAuthToken(), "", site.getOAuthTokenExpiresIn());
+            }
+        }
+
+        return obtainOAuthToken(oxdId, scopeType);
+    }
+
+    public Token obtainOAuthToken(String oxdId, ScopeType scopeType) {
+        Rp site = rpService.getRp(oxdId);
+        Token token = obtainToken(oxdId, scopeType, site);
+
+        site.setOAuthToken(token.getToken());
+        site.setOAuthTokenCreatedAt(new Date());
+        site.setOAuthTokenExpiresIn(token.getExpiresIn());
+        site.setOAuthTokenRefreshToken(token.getRefreshToken());
+
+        rpService.updateSilently(site);
+
+        return token;
+    }
+
+    public Token getPat(String oxdId, ScopeType scopeType) {
         validationService.notBlankOxdId(oxdId);
 
         Rp site = rpService.getRp(oxdId);
@@ -139,7 +172,7 @@ public class TokenService {
         return obtainPat(oxdId, scopeType);
     }
 
-    public Pat obtainPat(String oxdId, ScopeType scopeType) {
+    public Token obtainPat(String oxdId, ScopeType scopeType) {
         Rp site = rpService.getRp(oxdId);
         Token token = obtainToken(oxdId, scopeType, site);
 
@@ -150,7 +183,7 @@ public class TokenService {
 
         rpService.updateSilently(site);
 
-        return (Pat) token;
+        return token;
     }
 
     private Token obtainToken(String oxdId, ScopeType scopeType, Rp site) {

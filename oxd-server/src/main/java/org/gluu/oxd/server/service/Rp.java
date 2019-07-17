@@ -102,6 +102,16 @@ public class Rp implements Serializable {
     @JsonProperty(value = "uma_protected_resources")
     private List<UmaResource> umaProtectedResources = Lists.newArrayList();
 
+    @JsonProperty(value = "oauth_token")
+    private String oAuthToken;
+    @JsonProperty(value = "oauth_token_expires_in")
+    private int oAuthTokenExpiresIn;
+    @JsonProperty(value = "oauth_token_created_at")
+    private Date oAuthTokenCreatedAt;
+    @JsonProperty(value = "oauth_token_refresh_token")
+    private String oAuthTokenRefreshToken;
+
+
     @JsonProperty(value = "rpt")
     private String rpt;
     @JsonProperty(value = "rpt_token_type")
@@ -171,6 +181,11 @@ public class Rp implements Serializable {
         this.patExpiresIn = conf.patExpiresIn;
         this.patCreatedAt = conf.patCreatedAt;
         this.patRefreshToken = conf.patRefreshToken;
+
+        this.oAuthToken = conf.oAuthToken;
+        this.oAuthTokenExpiresIn = conf.oAuthTokenExpiresIn;
+        this.oAuthTokenCreatedAt = conf.oAuthTokenCreatedAt;
+        this.oAuthTokenRefreshToken = conf.oAuthTokenRefreshToken;
 
         this.rpt = conf.rpt;
         this.rptTokenType = conf.rptTokenType;
@@ -603,6 +618,38 @@ public class Rp implements Serializable {
         this.rptCreatedAt = rptCreatedAt;
     }
 
+    public String getOAuthToken() {
+        return oAuthToken;
+    }
+
+    public void setOAuthToken(String oAuthToken) {
+        this.oAuthToken = oAuthToken;
+    }
+
+    public int getOAuthTokenExpiresIn() {
+        return oAuthTokenExpiresIn;
+    }
+
+    public void setOAuthTokenExpiresIn(int oAuthTokenExpiresIn) {
+        this.oAuthTokenExpiresIn = oAuthTokenExpiresIn;
+    }
+
+    public Date getOAuthTokenCreatedAt() {
+        return oAuthTokenCreatedAt;
+    }
+
+    public void setOAuthTokenCreatedAt(Date oAuthTokenCreatedAt) {
+        this.oAuthTokenCreatedAt = oAuthTokenCreatedAt;
+    }
+
+    public String getOAuthTokenRefreshToken() {
+        return oAuthTokenRefreshToken;
+    }
+
+    public void setOAuthTokenRefreshToken(String oAuthTokenRefreshToken) {
+        this.oAuthTokenRefreshToken = oAuthTokenRefreshToken;
+    }
+
     public UmaResource umaResource(String path, String httpMethod) {
         List<UmaResource> copy = Lists.newArrayList(umaProtectedResources);
         Collections.reverse(copy);
@@ -655,6 +702,10 @@ public class Rp implements Serializable {
                 ", patExpiresIn=" + patExpiresIn +
                 ", patCreatedAt=" + patCreatedAt +
                 ", patRefreshToken='" + patRefreshToken + '\'' +
+                ", oAuthToken='" + oAuthToken + '\'' +
+                ", oAuthTokenExpiresIn='" + oAuthTokenExpiresIn + '\'' +
+                ", oAuthTokenCreatedAt='" + oAuthTokenCreatedAt + '\'' +
+                ", oAuthTokenRefreshToken='" + oAuthTokenRefreshToken + '\'' +
                 ", umaProtectedResources=" + umaProtectedResources +
                 ", rpt='" + rpt + '\'' +
                 ", rptTokenType='" + rptTokenType + '\'' +
